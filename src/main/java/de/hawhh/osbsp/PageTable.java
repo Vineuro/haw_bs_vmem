@@ -125,16 +125,34 @@ public class PageTable {
      * ersetzen
      */
     private PageTableEntry clockAlgorithm(PageTableEntry newPte) {
-        throw new RuntimeException("Nicht implementiert");
+        while (true) {
+            PageTableEntry currentPte = pteRAMlist.get(pteRAMlistIndex);
+
+            if (!currentPte.referenced) {
+                pteRAMlist.set(pteRAMlistIndex, newPte);
+                incrementPteRAMlistIndex();
+                return currentPte;
+            }
+
+            currentPte.referenced = false;
+            incrementPteRAMlistIndex();
+        }
     }
 
     /**
      * RANDOM-Algorithmus: Zufällige Auswahl
      */
     private PageTableEntry randomAlgorithm(PageTableEntry newPte) {
-        // ToDo
-        throw new RuntimeException("Nicht implementiert");
-        //return pte;
+        PageTableEntry pte; // Auswahl
+
+        int randomIndex = (int) (Math.random() * pteRAMlist.size());
+
+        pte = (PageTableEntry) pteRAMlist.get(randomIndex);
+        os.testOut("Prozess " + pid + ": Random-Algorithmus hat pte ausgewählt: "
+                + pte.virtPageNum);
+        pteRAMlist.remove(randomIndex);
+        pteRAMlist.add(newPte);
+        return pte;
     }
 
     // ----------------------- Hilfsmethode --------------------------------
